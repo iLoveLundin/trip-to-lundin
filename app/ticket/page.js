@@ -1,34 +1,81 @@
 'use client';
+
 import { useSearchParams } from 'next/navigation';
+import { Suspense, useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 
-export default function TicketPage() {
-  const searchParams = useSearchParams();
-  const name = searchParams.get('name') || 'Passenger';
-
-  return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-100 to-indigo-200 px-4">
-      <TicketContent name={name} />
-    </div>
-  );
+function formatTimeLeft(seconds) {
+  const min = String(Math.floor(seconds / 60)).padStart(2, '0');
+  const sec = String(seconds % 60).padStart(2, '0');
+  return `${min}:${sec}`;
 }
 
-function TicketContent({ name }) {
+function TicketContent() {
+  const searchParams = useSearchParams();
+  const name = searchParams.get('name') || 'Guest';
+
+  // Countdown logic (e.g., to release time)
+  const [timeLeft, setTimeLeft] = useState(300); // 5 minutes = 300 seconds
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setTimeLeft((prev) => (prev > 0 ? prev - 1 : 0));
+    }, 1000);
+    return () => clearInterval(interval);
+  }, []);
+
+  const handleDownload = () => {
+    window.print(); // Simple printable ticket
+  };
+
   return (
     <motion.div
-      initial={{ opacity: 0, scale: 0.95 }}
-      animate={{ opacity: 1, scale: 1 }}
-      transition={{ duration: 0.5 }}
-      className="bg-white shadow-2xl rounded-3xl p-8 max-w-md w-full border-4 border-dashed border-indigo-300"
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.6 }}
+      style={{
+        padding: '2rem',
+        fontFamily: 'sans-serif',
+        textAlign: 'center',
+        background: '#f3f4f6',
+        borderRadius: '1rem',
+        maxWidth: '500px',
+        margin: '4rem auto',
+        boxShadow: '0 0 30px rgba(0,0,0,0.1)',
+      }}
     >
-      <h2 className="text-xl font-bold text-indigo-700 mb-2 text-center">🎟️ Boarding Pass</h2>
-      <p className="text-gray-700 font-semibold">Passenger: <span className="text-indigo-600">{name}</span></p>
-      <p className="text-gray-700">Flight: TL2025</p>
-      <p className="text-gray-700">Departure: Earth</p>
-      <p className="text-gray-700">Destination: Mind of iLoveLundin</p>
-      <p className="text-gray-700 mt-2">Seat: Unlimited</p>
-      <p className="text-gray-700">Class: Creative</p>
-      <p className="text-sm text-center mt-4 text-gray-500 italic">Welcome aboard the Trip to Lundin ✈️</p>
+      <h1 style={{ fontSize: '2rem', marginBottom: '1rem' }}>🎫 Your Ticket to Lundin</h1>
+      <p style={{ fontSize: '1.25rem' }}>
+        Welcome aboard, <strong>{name}</strong>!
+      </p>
+
+      <div style={{ margin: '1.5rem 0', fontSize: '1.2rem' }}>
+        ⏱ Departure in: <strong>{formatTimeLeft(timeLeft)}</strong>
+      </div>
+
+      <button
+        onClick={handleDownload}
+        style={{
+          padding: '0.75rem 1.5rem',
+          fontSize: '1rem',
+          background: '#111827',
+          color: '#fff',
+          border: 'none',
+          borderRadius: '0.5rem',
+          cursor: 'pointer',
+        }}
+      >
+        Download Ticket
+      </button>
     </motion.div>
   );
 }
+
+export default function TicketPage() {
+  return (
+    <Suspense fallback={<div style={{ padding: '2rem' }}>Loading ticket...</div>}>
+      <TicketContent />
+    </Suspense>
+  );
+}
+
