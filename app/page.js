@@ -1,50 +1,41 @@
 'use client';
-import { useRouter } from 'next/navigation';
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 
-export default function Home() {
+export default function BookingPage() {
+  const [name, setName] = useState('');
   const router = useRouter();
-  const [from, setFrom] = useState('');
-  const [seatClass, setSeatClass] = useState('Creative');
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    router.push(`/ticket?from=${from}&class=${seatClass}`);
+    router.push(`/ticket?name=${encodeURIComponent(name)}`);
   };
 
   return (
-    <div className="min-h-screen bg-blue-50 flex items-center justify-center p-6">
-      <div className="bg-white shadow-xl rounded-2xl p-8 max-w-md w-full text-center space-y-6">
-        <h1 className="text-2xl font-bold">Book Your Flight to Lundin</h1>
-        <form onSubmit={handleSubmit} className="space-y-4">
+    <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-blue-200 to-indigo-200 px-4">
+      <div className="w-full max-w-md bg-white rounded-2xl shadow-2xl p-8">
+        <h1 className="text-2xl font-bold text-center text-indigo-700 mb-6">
+          ✈️ BOOK YOUR FLIGHT TO LUNDIN
+        </h1>
+        <form onSubmit={handleSubmit} className="space-y-6">
           <div>
-            <label className="block text-left font-medium">From</label>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Passenger Name
+            </label>
             <input
               type="text"
-              placeholder="Earth, NYC, London..."
-              value={from}
-              onChange={(e) => setFrom(e.target.value)}
-              className="w-full border border-gray-300 rounded px-3 py-2"
+              value={name}
               required
+              onChange={(e) => setName(e.target.value)}
+              placeholder="e.g. Jane Doe"
+              className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-indigo-400 focus:outline-none text-lg"
             />
-          </div>
-          <div>
-            <label className="block text-left font-medium">Class</label>
-            <select
-              value={seatClass}
-              onChange={(e) => setSeatClass(e.target.value)}
-              className="w-full border border-gray-300 rounded px-3 py-2"
-            >
-              <option value="Creative">Creative</option>
-              <option value="First-Class Inspiration">First-Class Inspiration</option>
-              <option value="Vibes Only">Vibes Only</option>
-            </select>
           </div>
           <button
             type="submit"
-            className="w-full bg-black text-white py-2 rounded hover:bg-gray-800"
+            className="w-full bg-indigo-600 text-white text-lg font-semibold py-3 rounded-xl hover:bg-indigo-700 transition"
           >
-            Book Flight
+            🎟️ Book Flight
           </button>
         </form>
       </div>
